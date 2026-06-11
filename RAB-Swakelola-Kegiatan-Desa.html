@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAB Swakelola Desa Barambai - Generator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  .glass {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .input-focus:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+  }
+  .modal {
+    transition: opacity 0.25s ease;
+  }
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  @keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @media print {
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <i class="fa-solid fa-calculator text-2xl"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl md:text-3xl font-bold">RAB Swakelola Desa Barambai</h1>
+            <p class="text-emerald-100 text-sm">Generator Rencana Anggaran Biaya Proyek Desa</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnBantuan" class="px-4 py-2.5 bg-white/20 hover:bg-white/30 rounded-xl font-medium transition-all flex items-center gap-2 backdrop-blur-sm">
+            <i class="fa-solid fa-circle-question"></i> Bantuan Hitung
+          </button>
+          <button id="btnExportPDF" class="px-4 py-2.5 bg-white text-emerald-600 hover:bg-emerald-50 rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg">
+            <i class="fa-solid fa-file-pdf"></i> Export PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Form Input -->
+      <div class="lg:col-span-1 space-y-6 no-print">
+        <div class="glass rounded-2xl p-6 shadow-xl animate-slide-in">
+          <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-file-lines text-emerald-600"></i> Informasi Kegiatan
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Kegiatan</label>
+              <input type="text" id="namaKegiatan" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all" placeholder="Contoh: Pembangunan Jalan Desa" value="Pembangunan Jalan Desa">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Tahun Anggaran</label>
+                <input type="number" id="tahunAnggaran" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all" value="2024">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Sumber Dana</label>
+                <select id="sumberDana" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all">
+                  <option>Dana Desa</option>
+                  <option>ADD</option>
+                  <option>APBD</option>
+                  <option>Swadaya</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Lokasi Kegiatan</label>
+              <input type="text" id="lokasiKegiatan" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all" placeholder="RT/RW Dusun" value="RT 01/RW 02 Desa Barambai">
+            </div>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 shadow-xl animate-slide-in">
+          <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-emerald-600"></i> Template Pekerjaan
+          </h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Template</label>
+            <select id="templatePekerjaan" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all">
+              <option value="jalan">Jalan Desa / Rabat Beton</option>
+              <option value="jembatan_ulin">Jembatan Ulin</option>
+              <option value="jembatan_beton">Jembatan Beton</option>
+              <option value="wc_umum">WC Umum</option>
+              <option value="wc_sederhana">WC Umum Sederhana 2×1.5m</option>
+              <option value="sumur_bor">Sumur Bor</option>
+              <option value="sumur_gali">Sumur Gali</option>
+              <option value="gorong">Gorong-gorong</option>
+              <option value="custom">Custom / Kosong</option>
+            </select>
+          </div>
+          <button id="btnApplyTemplate" class="mt-4 w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-magic"></i> Terapkan Template
+          </button>
+        </div>
+
+        <div class="glass rounded-2xl p-6 shadow-xl animate-slide-in">
+          <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-cube text-emerald-600"></i> Hitung Volume
+          </h2>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Metode Hitung Volume</label>
+            <select id="metodeHitung" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all">
+              <option value="plt">Input P×L×T</option>
+              <option value="unit">Input Volume/Unit Langsung</option>
+            </select>
+          </div>
+
+          <!-- P×L×T Fields -->
+          <div id="pltFields" class="space-y-3">
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Panjang (m)</label>
+                <input type="number" id="dimP" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus text-sm" value="100">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Lebar (m)</label>
+                <input type="number" id="dimL" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus text-sm" value="3">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Tebal/Tinggi (m)</label>
+                <input type="number" id="dimT" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg input-focus text-sm" value="0.15">
+              </div>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div class="text-xs text-blue-700 mb-1">Volume Terhitung:</div>
+              <div class="text-lg font-bold text-blue-900"><span id="volumeTerhitung">45.00</span> m³</div>
+            </div>
+          </div>
+
+          <!-- Unit Fields -->
+          <div id="unitFields" class="space-y-3 hidden">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Unit</label>
+              <input type="number" id="jumlahUnit" step="0.01" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all" value="1">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Volume per Unit</label>
+              <input type="number" id="volumePerUnit" step="0.01" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all" value="1">
+            </div>
+            <div class="bg-purple-50 border border-purple-200 rounded-lg p-3">
+              <div class="text-xs text-purple-700 mb-1">Total Volume:</div>
+              <div class="text-lg font-bold text-purple-900"><span id="totalVolumeUnit">1.00</span> m³</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Satuan Volume Utama</label>
+            <select id="satuanVolume" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all">
+              <option>m³</option>
+              <option>m²</option>
+              <option>m'</option>
+              <option>Unit</option>
+              <option>Titik</option>
+              <option>Buah</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAB Table -->
+      <div class="lg:col-span-2">
+        <div class="glass rounded-2xl p-6 shadow-xl animate-slide-in">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <i class="fa-solid fa-table text-emerald-600"></i> Rincian Anggaran Biaya
+            </h2>
+            <button id="btnTambahItem" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-all flex items-center gap-2">
+              <i class="fa-solid fa-plus"></i> Tambah Item
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" id="rabTable">
+              <thead>
+                <tr class="bg-gradient-to-r from-gray-100 to-gray-50 border-y-2 border-gray-300">
+                  <th class="px-3 py-3 text-left font-semibold text-gray-700 w-10">No</th>
+                  <th class="px-3 py-3 text-left font-semibold text-gray-700">Uraian Pekerjaan</th>
+                  <th class="px-3 py-3 text-center font-semibold text-gray-700 w-24">Volume</th>
+                  <th class="px-3 py-3 text-center font-semibold text-gray-700 w-20">Satuan</th>
+                  <th class="px-3 py-3 text-right font-semibold text-gray-700 w-32">Harga Satuan</th>
+                  <th class="px-3 py-3 text-right font-semibold text-gray-700 w-36">Jumlah</th>
+                  <th class="px-3 py-3 text-center font-semibold text-gray-700 w-16 no-print">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="rabTableBody">
+                <!-- Data akan diisi via JS -->
+              </tbody>
+              <tfoot>
+                <tr class="bg-gradient-to-r from-emerald-50 to-teal-50 border-t-2 border-emerald-300">
+                  <td colspan="5" class="px-3 py-4 text-right font-bold text-gray-800">TOTAL</td>
+                  <td class="px-3 py-4 text-right font-bold text-emerald-700 text-lg" id="totalRAB">Rp 0</td>
+                  <td class="no-print"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="mt-6 grid md:grid-cols-3 gap-4">
+            <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+              <div class="text-xs text-blue-700 mb-1">Total Material</div>
+              <div class="text-xl font-bold text-blue-900" id="totalMaterial">Rp 0</div>
+            </div>
+            <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
+              <div class="text-xs text-amber-700 mb-1">Total Upah</div>
+              <div class="text-xl font-bold text-amber-900" id="totalUpah">Rp 0</div>
+            </div>
+            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+              <div class="text-xs text-emerald-700 mb-1">Total Keseluruhan</div>
+              <div class="text-xl font-bold text-emerald-900" id="grandTotal">Rp 0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Bantuan -->
+  <div id="modalBantuan" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal no-print">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+      <div class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="text-xl font-bold flex items-center gap-2">
+          <i class="fa-solid fa-book"></i> Panduan Hitung Volume untuk TPK
+        </h3>
+        <button id="btnCloseBantuan" class="w-8 h-8 rounded-lg hover:bg-white/20 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div class="space-y-6 text-sm">
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-road text-emerald-600"></i> 1. Jalan / Rabat Beton
+            </h4>
+            <p class="text-gray-700">Volume = Panjang × Lebar × Tebal<br>
+            <span class="text-gray-600">Contoh: Jalan 100m × 3m × 0.15m = 45 m³</span></p>
+          </div>
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-bridge text-emerald-600"></i> 2. Jembatan Ulin/Beton
+            </h4>
+            <p class="text-gray-700">Hitung volume tiap struktur: Lantai, Balok, Pondasi<br>
+            <span class="text-gray-600">Total = Volume lantai + Volume balok + Volume pondasi</span></p>
+          </div>
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-restroom text-emerald-600"></i> 3. WC Umum / MCK
+            </h4>
+            <p class="text-gray-700">Volume dihitung per komponen:<br>
+            • Galian pondasi: Keliling × Lebar × Dalam<br>
+            • Pasangan bata: Luas dinding × Tebal<br>
+            • Plester: Luas dinding × 2 sisi<br>
+            • Lantai keramik: Panjang × Lebar<br>
+            • Atap: Luas atap efektif</p>
+          </div>
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-water text-emerald-600"></i> 4. Sumur Bor / Sumur Gali
+            </h4>
+            <p class="text-gray-700">Gunakan metode Unit: 1 titik sumur<br>
+            <span class="text-gray-600">Satuan: Unit/Titik. Volume per unit = 1</span></p>
+          </div>
+          <div>
+            <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-circle-exclamation text-emerald-600"></i> 5. Gorong-gorong
+            </h4>
+            <p class="text-gray-700">Hitung per buah atau per meter lari<br>
+            <span class="text-gray-600">Jika beli jadi: pakai Unit. Jika cor: hitung volume beton P×L×T</span></p>
+          </div>
+          <div class="bg-amber-50 border border-amber-300 rounded-xl p-4">
+            <h4 class="font-bold text-amber-900 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-lightbulb"></i> Tips Penting untuk TPK
+            </h4>
+            <ul class="list-disc list-inside text-amber-800 space-y-1">
+              <li>Selalu lakukan pengukuran lapangan aktual sebelum input</li>
+              <li>Tambahkan 5-10% untuk faktor kehilangan bahan/overlaps</li>
+              <li>Dokumentasikan foto sebelum, proses, dan sesudah</li>
+              <li>Harga satuan sesuaikan dengan harga pasar desa/kabupaten terbaru</li>
+              <li>Koordinasikan dengan pendamping desa untuk validasi</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { jsPDF } = window.jspdf;
+    
+    // State
+    let rabItems = [];
+    let itemIdCounter = 0;
+    let currentMetode = 'plt';
+
+    // Default templates dengan metode hitung
+    const templates = {
+      jalan: {
+        metode: 'plt',
+        satuan: 'm³',
+        nama: 'Pembangunan Jalan Rabat Beton',
+        items: [
+          { uraian: '1. PEKERJAAN PERSIAPAN', isHeader: true },
+          { uraian: 'Pembersihan Lokasi', vol: 'calc', satuan: 'm²', harga: 5000, kategori: 'Upah' },
+          { uraian: '2. PEKERJAAN BETON K-225', isHeader: true },
+          { uraian: 'Beton Ready Mix K-225', vol: 1, satuan: 'm³', harga: 850000, kategori: 'Material' },
+          { uraian: 'Besi Wiremesh M8', vol: 0.8, satuan: 'lembar', harga: 650000, kategori: 'Material' },
+          { uraian: 'Upah Cor Beton', vol: 1, satuan: 'm³', harga: 150000, kategori: 'Upah' },
+          { uraian: 'Bekisting', vol: 0.5, satuan: 'm²', harga: 85000, kategori: 'Upah' }
+        ]
+      },
+      jembatan_ulin: {
+        metode: 'plt',
+        satuan: 'm³',
+        nama: 'Pembangunan Jembatan Ulin',
+        items: [
+          { uraian: '1. STRUKTUR KAYU ULIN', isHeader: true },
+          { uraian: 'Kayu Ulin 8/12', vol: 2.5, satuan: 'm³', harga: 12000000, kategori: 'Material' },
+          { uraian: 'Papan Ulin 3x30', vol: 1.2, satuan: 'm³', harga: 13500000, kategori: 'Material' },
+          { uraian: 'Upah Pasang Kayu', vol: 3.7, satuan: 'm³', harga: 1500000, kategori: 'Upah' }
+        ]
+      },
+      jembatan_beton: {
+        metode: 'plt',
+        satuan: 'm³',
+        nama: 'Pembangunan Jembatan Beton',
+        items: [
+          { uraian: '1. PEKERJAAN PONDASI', isHeader: true },
+          { uraian: 'Galian Tanah', vol: 'calc', satuan: 'm³', harga: 75000, kategori: 'Upah' },
+          { uraian: '2. PEKERJAAN BETON', isHeader: true },
+          { uraian: 'Beton K-300', vol: 1, satuan: 'm³', harga: 950000, kategori: 'Material' },
+          { uraian: 'Besi Beton', vol: 150, satuan: 'kg', harga: 18000, kategori: 'Material' },
+          { uraian: 'Upah Pekerja', vol: 1, satuan: 'm³', harga: 200000, kategori: 'Upah' }
+        ]
+      },
+      wc_umum: {
+        metode: 'plt',
+        satuan: 'Unit',
+        nama: 'Pembangunan WC Umum',
+        items: [
+          { uraian: '1. PEKERJAAN TANAH & PONDASI', isHeader: true },
+          { uraian: 'Galian Pondasi', vol: 2.5, satuan: 'm³', harga: 75000, kategori: 'Upah' },
+          { uraian: 'Pasangan Pondasi Batu', vol: 2, satuan: 'm³', harga: 650000, kategori: 'Material' },
+          { uraian: '2. PEKERJAAN DINDING', isHeader: true },
+          { uraian: 'Pasangan Bata Merah', vol: 25, satuan: 'm²', harga: 120000, kategori: 'Material' },
+          { uraian: 'Plester + Aci', vol: 50, satuan: 'm²', harga: 55000, kategori: 'Upah' },
+          { uraian: '3. LANTAI & ATAP', isHeader: true },
+          { uraian: 'Lantai Keramik 30x30', vol: 4, satuan: 'm²', harga: 95000, kategori: 'Material' },
+          { uraian: 'Rangka Atap + Seng', vol: 6, satuan: 'm²', harga: 150000, kategori: 'Material' },
+          { uraian: 'Closet Jongkok + Instalasi', vol: 1, satuan: 'unit', harga: 1500000, kategori: 'Material' }
+        ]
+      },
+      wc_sederhana: {
+        metode: 'plt',
+        satuan: 'Unit',
+        nama: 'WC Umum Sederhana 2×1.5m',
+        items: [
+          { uraian: '1. PEKERJAAN TANAH', isHeader: true },
+          { uraian: 'Galian Pondasi (0.6×0.4×7m keliling)', vol: 1.68, satuan: 'm³', harga: 75000, kategori: 'Upah' },
+          { uraian: 'Urugan Pasir Bawah Pondasi', vol: 0.3, satuan: 'm³', harga: 200000, kategori: 'Material' },
+          { uraian: '2. PEKERJAAN PONDASI & STRUKTUR', isHeader: true },
+          { uraian: 'Pasangan Batu Kali Pondasi', vol: 1.5, satuan: 'm³', harga: 650000, kategori: 'Material' },
+          { uraian: 'Sloof Beton 15/20', vol: 0.21, satuan: 'm³', harga: 1200000, kategori: 'Material' },
+          { uraian: '3. PEKERJAAN DINDING', isHeader: true },
+          { uraian: 'Pasangan Bata Merah 1:4 (2×2.5×1.5×2.5m)', vol: 18.75, satuan: 'm²', harga: 120000, kategori: 'Material' },
+          { uraian: 'Plester 1:4 + Aci', vol: 37.5, satuan: 'm²', harga: 55000, kategori: 'Upah' },
+          { uraian: '4. PEKERJAAN LANTAI & ATAP', isHeader: true },
+          { uraian: 'Lantai Keramik 30×30 (2×1.5m)', vol: 3, satuan: 'm²', harga: 95000, kategori: 'Material' },
+          { uraian: 'Atap Seng Gelombang + Rangka', vol: 4, satuan: 'm²', harga: 150000, kategori: 'Material' },
+          { uraian: '5. SANITASI', isHeader: true },
+          { uraian: 'Closet Jongkok + Septic Tank Mini', vol: 1, satuan: 'unit', harga: 2500000, kategori: 'Material' },
+          { uraian: 'Pintu PVC + Kusen', vol: 1, satuan: 'unit', harga: 750000, kategori: 'Material' }
+        ]
+      },
+      sumur_bor: {
+        metode: 'unit',
+        satuan: 'Unit',
+        nama: 'Pembuatan Sumur Bor',
+        items: [
+          { uraian: '1. PENGEBORAN', isHeader: true },
+          { uraian: 'Jasa Pengeboran s/d 40m', vol: 1, satuan: 'unit', harga: 5000000, kategori: 'Upah' },
+          { uraian: 'Casing PVC 4"', vol: 40, satuan: 'm', harga: 45000, kategori: 'Material' },
+          { uraian: '2. INSTALASI POMPA', isHeader: true },
+          { uraian: 'Pompa Submersible 0.5HP', vol: 1, satuan: 'unit', harga: 2500000, kategori: 'Material' },
+          { uraian: 'Pipa PVC + Aksesoris', vol: 1, satuan: 'ls', harga: 850000, kategori: 'Material' },
+          { uraian: 'Upah Instalasi', vol: 1, satuan: 'ls', harga: 750000, kategori: 'Upah' }
+        ]
+      },
+      sumur_gali: {
+        metode: 'unit',
+        satuan: 'Unit',
+        nama: 'Pembuatan Sumur Gali',
+        items: [
+          { uraian: '1. PENGGALIAN', isHeader: true },
+          { uraian: 'Upah Gali Sumur s/d 12m', vol: 12, satuan: 'm', harga: 250000, kategori: 'Upah' },
+          { uraian: '2. DINDING SUMUR', isHeader: true },
+          { uraian: 'Buis Beton 80cm', vol: 12, satuan: 'buah', harga: 150000, kategori: 'Material' },
+          { uraian: 'Upah Pasang Buis', vol: 12, satuan: 'buah', harga: 50000, kategori: 'Upah' },
+          { uraian: 'Tutup Sumur Beton', vol: 1, satuan: 'unit', harga: 450000, kategori: 'Material' }
+        ]
+      },
+      gorong: {
+        metode: 'unit',
+        satuan: 'Unit',
+        nama: 'Pembuatan Gorong-gorong',
+        items: [
+          { uraian: '1. GALIAN & PERSIAPAN', isHeader: true },
+          { uraian: 'Galian Tanah', vol: 3, satuan: 'm³', harga: 75000, kategori: 'Upah' },
+          { uraian: '2. PEMASANGAN', isHeader: true },
+          { uraian: 'Buis Beton Ø60cm', vol: 6, satuan: 'buah', harga: 275000, kategori: 'Material' },
+          { uraian: 'Upah Pasang Buis', vol: 6, satuan: 'buah', harga: 75000, kategori: 'Upah' },
+          { uraian: 'Pasangan Sayap', vol: 1, satuan: 'ls', harga: 1200000, kategori: 'Material' }
+        ]
+      },
+      custom: {
+        metode: 'plt',
+        satuan: 'm³',
+        nama: 'Kegiatan Custom',
+        items: []
+      }
+    };
+
+    // Elements
+    const metodeHitung = document.getElementById('metodeHitung');
+    const pltFields = document.getElementById('pltFields');
+    const unitFields = document.getElementById('unitFields');
+    const dimP = document.getElementById('dimP');
+    const dimL = document.getElementById('dimL');
+    const dimT = document.getElementById('dimT');
+    const jumlahUnit = document.getElementById('jumlahUnit');
+    const volumePerUnit = document.getElementById('volumePerUnit');
+    const satuanVolume = document.getElementById('satuanVolume');
+
+    // Format Rupiah
+    function formatRupiah(num) {
+      return 'Rp ' + num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    // Hitung Volume
+    function hitungVolume() {
+      let totalVol = 0;
+      if (currentMetode === 'plt') {
+        const p = parseFloat(dimP.value) || 0;
+        const l = parseFloat(dimL.value) || 0;
+        const t = parseFloat(dimT.value) || 0;
+        totalVol = p * l * t;
+        document.getElementById('volumeTerhitung').textContent = totalVol.toFixed(2);
+      } else {
+        const jml = parseFloat(jumlahUnit.value) || 0;
+        const volUnit = parseFloat(volumePerUnit.value) || 0;
+        totalVol = jml * volUnit;
+        document.getElementById('totalVolumeUnit').textContent = totalVol.toFixed(2);
+      }
+      updateCalcVolume(totalVol);
+      return totalVol;
+    }
+
+    // Update volume pada item yang pakai 'calc'
+    function updateCalcVolume(totalVol) {
+      rabItems.forEach(item => {
+        if (item.vol === 'calc') {
+          item.totalVol = totalVol;
+        }
+      });
+      renderTable();
+    }
+
+    // Switch metode hitung
+    metodeHitung.addEventListener('change', (e) => {
+      currentMetode = e.target.value;
+      if (currentMetode === 'plt') {
+        pltFields.classList.remove('hidden');
+        unitFields.classList.add('hidden');
+      } else {
+        pltFields.classList.add('hidden');
+        unitFields.classList.remove('hidden');
+      }
+      hitungVolume();
+    });
+
+    [dimP, dimL, dimT, jumlahUnit, volumePerUnit].forEach(input => {
+      input.addEventListener('input', hitungVolume);
+    });
+
+    // Apply Template
+    document.getElementById('btnApplyTemplate').addEventListener('click', () => {
+      const template = document.getElementById('templatePekerjaan').value;
+      const data = templates[template];
+      
+      document.getElementById('namaKegiatan').value = data.nama;
+      metodeHitung.value = data.metode;
+      currentMetode = data.metode;
+      satuanVolume.value = data.satuan;
+      
+      if (currentMetode === 'plt') {
+        pltFields.classList.remove('hidden');
+        unitFields.classList.add('hidden');
+      } else {
+        pltFields.classList.add('hidden');
+        unitFields.classList.remove('hidden');
+      }
+
+      rabItems = data.items.map(item => ({
+        id: ++itemIdCounter,
+        ...item,
+        jumlah: 0
+      }));
+      
+      hitungVolume();
+      renderTable();
+    });
+
+    // Render Table
+    function renderTable() {
+      const tbody = document.getElementById('rabTableBody');
+      tbody.innerHTML = '';
+      let no = 1;
+      let totalMaterial = 0;
+      let totalUpah = 0;
+
+      rabItems.forEach((item, idx) => {
+        if (item.isHeader) {
+          const tr = document.createElement('tr');
+          tr.className = 'bg-gray-100';
+          tr.innerHTML = `
+            <td colspan="6" class="px-3 py-2.5 font-semibold text-gray-800">${item.uraian}</td>
+            <td class="px-3 py-2.5 text-center no-print">
+              <button onclick="hapusItem(${item.id})" class="text-red-600 hover:text-red-800">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        } else {
+          const realVol = item.vol === 'calc' ? (item.totalVol || 0) : item.vol;
+          const jumlah = realVol * item.harga;
+          item.jumlah = jumlah;
+          
+          if (item.kategori === 'Material') totalMaterial += jumlah;
+          else if (item.kategori === 'Upah') totalUpah += jumlah;
+
+          const tr = document.createElement('tr');
+          tr.className = 'border-b border-gray-200 hover:bg-gray-50';
+          tr.innerHTML = `
+            <td class="px-3 py-2.5 text-center text-gray-600">${no++}</td>
+            <td class="px-3 py-2.5">
+              <input type="text" value="${item.uraian}" onchange="updateItem(${item.id}, 'uraian', this.value)" 
+                class="w-full px-2 py-1 border-0 focus:ring-2 focus:ring-emerald-500 rounded">
+            </td>
+            <td class="px-3 py-2.5 text-center">
+              ${item.vol === 'calc' ? 
+                `<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">Auto: ${realVol.toFixed(2)}</span>` :
+                `<input type="number" step="0.01" value="${item.vol}" onchange="updateItem(${item.id}, 'vol', this.value)" 
+                  class="w-20 px-2 py-1 border border-gray-300 rounded text-center focus:ring-2 focus:ring-emerald-500">`
+              }
+            </td>
+            <td class="px-3 py-2.5 text-center">
+              <input type="text" value="${item.satuan}" onchange="updateItem(${item.id}, 'satuan', this.value)" 
+                class="w-16 px-2 py-1 border border-gray-300 rounded text-center focus:ring-2 focus:ring-emerald-500">
+            </td>
+            <td class="px-3 py-2.5 text-right">
+              <input type="number" value="${item.harga}" onchange="updateItem(${item.id}, 'harga', this.value)" 
+                class="w-28 px-2 py-1 border border-gray-300 rounded text-right focus:ring-2 focus:ring-emerald-500">
+            </td>
+            <td class="px-3 py-2.5 text-right font-semibold text-gray-800">${formatRupiah(jumlah)}</td>
+            <td class="px-3 py-2.5 text-center no-print">
+              <button onclick="hapusItem(${item.id})" class="text-red-600 hover:text-red-800 p-1">
+                <i class="fa-solid fa-trash text-sm"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
+      const grandTotal = totalMaterial + totalUpah;
+      document.getElementById('totalRAB').textContent = formatRupiah(grandTotal);
+      document.getElementById('totalMaterial').textContent = formatRupiah(totalMaterial);
+      document.getElementById('totalUpah').textContent = formatRupiah(totalUpah);
+      document.getElementById('grandTotal').textContent = formatRupiah(grandTotal);
+    }
+
+    // Update Item
+    window.updateItem = function(id, field, value) {
+      const item = rabItems.find(i => i.id === id);
+      if (item) {
+        if (field === 'vol' || field === 'harga') {
+          item[field] = parseFloat(value) || 0;
+        } else {
+          item[field] = value;
+        }
+        renderTable();
+      }
+    }
+
+    // Hapus Item
+    window.hapusItem = function(id) {
+      rabItems = rabItems.filter(i => i.id !== id);
+      renderTable();
+    }
+
+    // Tambah Item
+    document.getElementById('btnTambahItem').addEventListener('click', () => {
+      rabItems.push({
+        id: ++itemIdCounter,
+        uraian: 'Item Baru',
+        vol: 1,
+        satuan: satuanVolume.value,
+        harga: 0,
+        kategori: 'Material',
+        jumlah: 0
+      });
+      renderTable();
+    });
+
+    // Modal Bantuan
+    document.getElementById('btnBantuan').addEventListener('click', () => {
+      document.getElementById('modalBantuan').classList.remove('hidden');
+    });
+    document.getElementById('btnCloseBantuan').addEventListener('click', () => {
+      document.getElementById('modalBantuan').classList.add('hidden');
+    });
+    document.getElementById('modalBantuan').addEventListener('click', (e) => {
+      if (e.target.id === 'modalBantuan') {
+        document.getElementById('modalBantuan').classList.add('hidden');
+      }
+    });
+
+    // Export PDF
+    document.getElementById('btnExportPDF').addEventListener('click', () => {
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      // Header
+      doc.setFillColor(5, 150, 105);
+      doc.rect(0, 0, pageWidth, 35, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('RENCANA ANGGARAN BIAYA (RAB)', pageWidth / 2, 15, { align: 'center' });
+      doc.setFontSize(14);
+      doc.text('SWAKELOLA DESA BARAMBAI', pageWidth / 2, 23, { align: 'center' });
+      
+      // Info Kegiatan
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      let y = 45;
+      doc.text(`Nama Kegiatan  : ${document.getElementById('namaKegiatan').value}`, 14, y);
+      doc.text(`Tahun Anggaran : ${document.getElementById('tahunAnggaran').value}`, 120, y);
+      y += 6;
+      doc.text(`Sumber Dana    : ${document.getElementById('sumberDana').value}`, 14, y);
+      doc.text(`Metode Hitung  : ${metodeHitung.value === 'plt' ? 'P×L×T' : 'Unit'}`, 120, y);
+      y += 6;
+      doc.text(`Lokasi         : ${document.getElementById('lokasiKegiatan').value}`, 14, y);
+      
+      // Dimensi
+      y += 6;
+      if (currentMetode === 'plt') {
+        doc.text(`Dimensi        : ${dimP.value}m × ${dimL.value}m × ${dimT.value}m = ${hitungVolume().toFixed(2)} ${satuanVolume.value}`, 14, y);
+      } else {
+        doc.text(`Volume         : ${jumlahUnit.value} × ${volumePerUnit.value} = ${hitungVolume().toFixed(2)} ${satuanVolume.value}`, 14, y);
+      }
+      
+      // Table
+      y += 10;
+      const tableData = [];
+      let no = 1;
+      let totalMaterial = 0;
+      let totalUpah = 0;
+
+      rabItems.forEach(item => {
+        if (item.isHeader) {
+          tableData.push([{ content: item.uraian, colSpan: 6, styles: { fontStyle: 'bold', fillColor: [243, 244, 246] } }]);
+        } else {
+          const realVol = item.vol === 'calc' ? (item.totalVol || 0) : item.vol;
+          const jumlah = realVol * item.harga;
+          if (item.kategori === 'Material') totalMaterial += jumlah;
+          else totalUpah += jumlah;
+          
+          tableData.push([
+            no++,
+            item.uraian,
+            realVol.toFixed(2),
+            item.satuan,
+            item.harga.toLocaleString('id-ID'),
+            jumlah.toLocaleString('id-ID')
+          ]);
+        }
+      });
+      
+      const grandTotal = totalMaterial + totalUpah;
+      tableData.push([
+        { content: 'TOTAL', colSpan: 5, styles: { fontStyle: 'bold', halign: 'right' } },
+        { content: grandTotal.toLocaleString('id-ID'), styles: { fontStyle: 'bold', halign: 'right' } }
+      ]);
+
+      doc.autoTable({
+        startY: y,
+        head: [['No', 'Uraian Pekerjaan', 'Vol', 'Sat', 'Harga Satuan', 'Jumlah (Rp)']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [5, 150, 105], textColor: 255, fontStyle: 'bold' },
+        styles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 10, halign: 'center' },
+          1: { cellWidth: 75 },
+          2: { cellWidth: 15, halign: 'center' },
+          3: { cellWidth: 15, halign: 'center' },
+          4: { cellWidth: 30, halign: 'right' },
+          5: { cellWidth: 35, halign: 'right' }
+        }
+      });
+
+      // Summary
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(9);
+      doc.text(`Total Material : Rp ${totalMaterial.toLocaleString('id-ID')}`, 14, finalY);
+      doc.text(`Total Upah     : Rp ${totalUpah.toLocaleString('id-ID')}`, 14, finalY + 5);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`GRAND TOTAL  : Rp ${grandTotal.toLocaleString('id-ID')}`, 14, finalY + 10);
+      
+      // TTD
+      doc.setFont('helvetica', 'normal');
+      doc.text('Barambai, ...........................', 140, finalY + 5);
+      doc.text('Tim Pelaksana Kegiatan (TPK)', 140, finalY + 10);
+      doc.text('', 140, finalY + 30);
+      doc.text('( ................................. )', 140, finalY + 35);
+      doc.text('Ketua TPK', 140, finalY + 40);
+      
+      doc.save(`RAB_${document.getElementById('namaKegiatan').value.replace(/\s+/g, '_')}.pdf`);
+    });
+
+    // Init
+    document.getElementById('btnApplyTemplate').click();
+  </script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
